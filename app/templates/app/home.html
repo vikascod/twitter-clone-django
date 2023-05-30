@@ -1,0 +1,86 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to Twitter Clone with Django</h1>
+            <p class="lead">Connect with the world and express yourself.</p>
+            <hr class="my-4">
+            <p>Join the conversation and stay updated with the latest trends.</p>
+            {% if not request.user.is_authenticated %}
+            <a class="btn btn-primary btn-lg" href="{% url 'signup' %}" role="button">Sign Up</a>
+            <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}" role="button">Log In</a>
+            {% endif %}
+        </div>
+        {% if request.user.is_authenticated %}
+
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ request.user.username }} Profile</h5>
+                        <p class="card-text">Username: {{ request.user.username }}</p>
+                        <p class="card-text">Followers: {{ request.user.profile.followed_by.count }}</p>
+                        <p class="card-text">Following: {{ request.user.profile.follows.count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <!-- Feed or Timeline Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Timeline</h5>
+                        {% for tweet in tweets %}
+                        <div class="alert alert-dark" role="alert">
+                            {% if tweet.user.profile.profile_pic %}
+                            <img src="{{ tweet.user.profile.profile_pic }}" class="rounded-circle" width="50px" height="50px" alt="">
+                            {% else %}
+                            <img src="{% static 'images/user1.png' %}" class="rounded-circle" width="50px" height="50px" alt="">
+                            {% endif %}
+                            {{ tweet.body }} <br><br>
+                            <small class="text-muted">
+                                {{ tweet.created_on }} by <a href="{% url 'profile' tweet.user.id %}">{{ tweet.user.username }}</a>
+                                - {{ tweet.total_likes }} - Likes
+                                {% if user in tweet.likes.all %}
+                                <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Unlike</a>
+                                {% else %}
+                                <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Like</a>
+                                {% endif %}
+                                 <a href="{% url 'tweet_share' tweet.id %}" class="btn btn-sm btn-primary">Share</a>
+                            </small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <!-- Notifications Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tweet</h5>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="submit" class="btn btn-primary" value="Post">
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Trending Topics Section -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Trending Topics</h5>
+                        <span>Football</span> <br>
+                        <span>Bettleground Mobile India</span> <br>
+                        <span>Vikas the great</span>
+                    </div>
+                </div>
+            </div>              
+        {% endif %}
+    </div>
+
+{% endblock content %}

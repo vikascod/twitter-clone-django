@@ -1,0 +1,25 @@
+{% extends 'app/base.html' %}
+
+{% block title %}
+    User Profile
+{% endblock title %}
+
+
+{% block content %}
+    <div class="container mt-2">
+        {% if profiles %}
+            {% for profile in profiles %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        {% if profile.profile_pic %}
+                        <img src="{{ profile.profile_pic.url }}" width="100px" height="100px" alt="">
+                        {% endif %}
+                        <h5 class="card-title" style="color: #2f7fbf; font-weight: bold;">Username: {{ profile.user.username }}</h5>
+                        <p class="card-text" style="color: #6c757d;">Link: <a href="{% url 'profile' profile.user.id %}">@{{ profile.user.username|lower }}</a></p>
+                        <p class="card-text" style="color: #6c757d;">Last Update: {{ profile.updated_date }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock content %}
