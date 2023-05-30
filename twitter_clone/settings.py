@@ -94,6 +94,22 @@ else:
         }
     }
 
+
+# Redis configuration
+
+CACHE_TTL = 60
+
+CACHE = {
+    'default':{
+        "BACKEND":"django_redis.cache.RedisCache",
+        "LOCATION": "",
+        "OPTIONAL":{
+            "CLIENT_CLASS": "django_redis.cache.DefaultClient",
+        },
+        "KEY_PRIFIX":"example"
+    }
+}
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

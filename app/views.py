@@ -5,7 +5,13 @@ from app.forms import TweetForm, SignUpForm, UpdateUserProfileForm, ProfileForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
+# from django.contrib.decorators.cache import cache_page
+from django.conf import settings
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 
+
+CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
 
 
 def home(request):
@@ -18,7 +24,15 @@ def home(request):
                 tweet.save()
                 messages.success(request, "Successfully posted")
                 return redirect('home')
-        tweets = Tweet.objects.all().order_by('-created_on')
+            tweets = cache.get('tweets')
+            if not tweets:
+                tweets = Tweet.objects.all().order_by('-created_on')
+                cache.set('tweets', tweets, CACHE_TTL)
+                print("Cache set")
+            else:
+                print("Cache get")
+        else:
+            tweets = Tweet.objects.all().order_by('-created_on')
         return render(request, 'app/home.html', {'tweets':tweets, 'form':form})
     else:
         tweets = Tweet.objects.all().order_by('-created_on')
