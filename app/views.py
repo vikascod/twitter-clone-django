@@ -183,3 +183,25 @@ def comment_view(request, pk):
     comments = Comment.objects.filter(tweet=tweet)
     return render(request, 'app/comment.html', {'form':form, 'tweet':tweet, 'comments':comments})
 
+@login_required(login_url='login')
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
+
+    if comment.user != request.user:
+        messages.error(request, "You don't have permission to delete this comment.")
+        return redirect(request.META.get('HTTP_REFERER'))
+
+    comment.delete()
+    messages.success(request, 'Comment deleted successfully.')
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def comment_update_view(request, pk):
+    comment = get_object_or_404(Comment, id=pk)
+    form = CommentForm(request.POST or None, instance=comment)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect('comment', pk=pk)
+    return render(request, 'app/comment_update.html', {'form':form, 'comment':comment})
+
