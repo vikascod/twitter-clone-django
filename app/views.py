@@ -6,9 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
-# from django.contrib.decorators.cache import cache_page
 from django.conf import settings
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django_ratelimit.decorators import ratelimit
 
 
 CACHE_TTL = getattr(settings, "CACHE_TTL", DEFAULT_TIMEOUT)
@@ -85,6 +85,7 @@ def follow_view(request, pk):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+@ratelimit(key='user_or_ip', rate='5/m')
 def login_view(request):
     if not request.user.is_authenticated:
         if request.method == "POST":
@@ -104,6 +105,7 @@ def login_view(request):
         return redirect('home')
 
 
+@login_required(login_url='login')
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
@@ -112,7 +114,7 @@ def logout_view(request):
         messages.warning(request, "You haven't logged in yet!!")
         return redirect('login')
 
-
+@ratelimit(key="user_or_ip", rate='5/m')
 def signup_view(request):
     if not request.user.is_authenticated:
         if request.method == "POST":
@@ -140,6 +142,7 @@ def signup_view(request):
         return redirect('home')
 
 
+@ratelimit(key='user_or_ip', rate='4/m')
 @login_required(login_url='login')
 def update_user_profile(request):
     current_user = User.objects.get(id=request.user.id)
