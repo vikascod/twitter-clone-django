@@ -1,5 +1,5 @@
 from django import forms
-from app.models import Tweet, Profile
+from app.models import Tweet, Profile, Comment
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -42,3 +42,11 @@ class UpdateUserProfileForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username','email','first_name','last_name']
+
+
+class CommentForm(forms.ModelForm):
+    body = forms.CharField(label="", widget=forms.Textarea(attrs={'class':'form-control'}))
+    class Meta:
+        model = Comment
+        fields = ['body']
+        exclude = ('user', 'tweet')

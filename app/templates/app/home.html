@@ -50,7 +50,7 @@
                                 {% else %}
                                 <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Like</a>
                                 {% endif %}
-                                 <a href="{% url 'tweet_share' tweet.id %}" class="btn btn-sm btn-primary">Share</a>
+                                 <a href="{% url 'comment' tweet.id %}" class="btn btn-sm btn-primary">Comment</a>
                             </small>
                         </div>
                         {% endfor %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from app.models import Profile, Tweet
+from app.models import Profile, Tweet, Comment
 from django.contrib import messages
-from app.forms import TweetForm, SignUpForm, UpdateUserProfileForm, ProfileForm
+from app.forms import TweetForm, SignUpForm, UpdateUserProfileForm, ProfileForm, CommentForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -170,11 +170,16 @@ def tweet_like(request, pk):
 
 
 @login_required(login_url='login')
-def tweet_shere(request, pk):
+def comment_view(request, pk):
     tweet = get_object_or_404(Tweet, id=pk)
-    if tweet:
-        return render(request, 'app/tweet_share.html', {'tweet':tweet})
-    else:
-        messages.warning(request, "Tweet doesn't not exists!")
+    user = User.objects.get(id=request.user.id)
+    form = CommentForm(request.POST or None)
+    if request.method == "POST":
+        comment = form.save(commit=False)
+        comment.user = user
+        comment.tweet = tweet
+        comment.save()
         return redirect(request.META.get('HTTP_REFERER'))
+    comments = Comment.objects.filter(tweet=tweet)
+    return render(request, 'app/comment.html', {'form':form, 'tweet':tweet, 'comments':comments})
 

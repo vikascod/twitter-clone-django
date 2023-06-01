@@ -1,0 +1,76 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock title %}
+
+{% block content %}
+    <div class="container mb-4">
+        {% if request.user.is_authenticated %}
+
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <!-- Feed or Timeline Section -->
+                <div class="card">
+                    <div class="card-body">
+                        {% if tweet %}
+                        <div class="alert alert-dark" role="alert">
+                            {% if tweet.user.profile.profile_pic %}
+                            <img src="{{ tweet.user.profile.profile_pic.url }}" class="rounded-circle" width="50px" height="50px" alt="">
+                            {% else %}
+                            <img src="{% static 'images/user1.png' %}" class="rounded-circle" width="50px" height="50px" alt="">
+                            {% endif %}
+                            {{ tweet.body }} <br><br>
+                            <small class="text-muted">
+                                {{ tweet.created_on }} by <a href="{% url 'profile' tweet.user.id %}">{{ tweet.user.username }}</a>
+                                - {{ tweet.total_likes }} - Likes
+                                {% if user in tweet.likes.all %}
+                                <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Unlike</a>
+                                {% else %}
+                                <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Like</a>
+                                {% endif %}
+                            </small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <!-- Comments Section -->
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Comments</h5>
+                                {% for comment in comments %}
+                                <div class="media"> <hr>
+                                    {% if comment.user.profile.profile_pic %}
+                                    <img src="{{ comment.user.profile.profile_pic.url }}" class="rounded-circle" width="50px" height="50px" alt="">
+                                    {% else %}
+                                    <img src="{% static 'images/user1.png' %}" class="rounded-circle" width="50px" height="50px" alt="">
+                                    {% endif %}
+                                    {{ comment.body }}
+                                    <div class="media-body ml-2">
+                                        <h6 class="mt-0">{{ comment.user.username }}</h6>
+                                    </div>
+                                    <small>{{ comment.created_on|timesince }}</small> ago
+                                </div>
+                                {% empty %}
+                                <p>No comments yet.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Comment</h5>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="submit" class="btn btn-primary" value="Comment">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}
