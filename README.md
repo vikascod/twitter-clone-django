@@ -9,6 +9,7 @@ This is a Twitter clone project built using Django. It aims to replicate the bas
 - User registration and authentication
 - Posting tweets
 - Following and unfollowing users
+- Give follow back
 - Timeline view showing tweets from followed users
 - User profile page
 - Like and comment on tweets
