@@ -50,6 +50,29 @@ def user_profile(request):
         messages.warning(request, "You must be logged in")
         return redirect('home')
 
+def follower_list(request, pk):
+    if request.user.is_authenticated:
+        profiles = Profile.objects.get(user_id=pk)
+        context = {
+            'profiles':profiles
+        }
+        return render(request, 'app/follower_list.html', context)
+    else:
+        messages.warning(request, "You must be logged in")
+        return redirect('home')
+
+
+def following_list(request, pk):
+    if request.user.is_authenticated:
+        profiles = Profile.objects.get(user_id=pk)
+        context = {
+            'profiles':profiles
+        }
+        return render(request, 'app/following_list.html', context)
+    else:
+        messages.warning(request, "You must be logged in")
+        return redirect('home')
+    
 
 def profile_view(request, pk):
     if request.user.is_authenticated:
@@ -196,6 +219,7 @@ def comment_delete(request, pk):
     return redirect(request.META.get('HTTP_REFERER'))
 
 
+@login_required(login_url='login')
 def comment_update_view(request, pk):
     comment = get_object_or_404(Comment, id=pk)
     form = CommentForm(request.POST or None, instance=comment)
@@ -205,3 +229,51 @@ def comment_update_view(request, pk):
             return redirect('comment', pk=pk)
     return render(request, 'app/comment_update.html', {'form':form, 'comment':comment})
 
+
+@login_required(login_url='login')
+def delete_tweet(request, pk):
+    try:
+        tweet = Tweet.objects.get(id=pk)
+        
+        if not tweet:
+            messages.error(request, "No tweet found")
+            return redirect('home')
+        
+        if tweet.user.id == request.user.id:
+            tweet.delete()
+            messages.success(request, "Tweet has been deleted!")
+            return redirect(request.META.get('HTTP_REFERER'))
+
+        messages.error(request, "You are not authorized to delete this tweet")
+        return redirect('home')
+
+    except Tweet.DoesNotExist:
+        messages.error(request, "No tweet found")
+        return redirect('home')
+
+
+@login_required(login_url='login')
+def update_tweet(request, pk):
+    try:
+        tweet = Tweet.objects.get(id=pk)
+        if not tweet:
+            messages.error(request, 'No tweet found')
+            return redirect('home')
+        if not request.user.id == tweet.user.id:
+            messages.error(request, 'You are not authorized to edit this tweet')
+            return redirect('home')
+
+        form = TweetForm(request.POST or None, instance=tweet)
+        if request.method == 'POST':
+            if form.is_valid():
+                form.save(commit=False)
+                tweet.user = request.user
+                tweet.save()
+                messages.success(request, 'Tweet Successfully updated!')
+                return redirect('home')
+
+    except Tweet.DoesNotExist:
+        messages.error(request, 'No tweet found')
+        return redirect('home')
+
+    return render(request, 'app/update_tweet.html', {'form':form, 'tweet':tweet})

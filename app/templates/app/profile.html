@@ -38,6 +38,10 @@
                                   <a href="{% url 'tweet_like' tweet.id %}" class="btn btn-sm btn-info">Like</a>
                                 {% endif %}
                             </small>
+                            {% if request.user.id == tweet.user.id %}
+                            <a href="{% url 'delete_tweet' tweet.id %}">Delete</a>
+                            <a href="{% url 'update_tweet' tweet.id %}">Edit</a>
+                            {% endif %}
                         </div>
                       </div>
                     </div>
@@ -69,7 +73,7 @@
                 <div class="card mt-3">
                     <h5 class="card-header">Following</h5>
                     <div class="card-body">
-                        {% for following in profile.follows.all %}
+                        {% for following in profile.follows.all|slice:5 %}
                         <a href="{% url 'profile' following.user.id %}">@{{ following }}
                         {% if request.user.id == profile.user.id %}
                           <a href="{% url 'unfollow' following.user.id %}" class="btn btn-sm btn-warning mt-1">Unfollow</a>
@@ -78,12 +82,15 @@
                         {% endif %}
                         {% endfor %}
                     </div>
+                    <div class="card-footer">
+                      <a href="{% url 'following_list' profile.user.id %}">More ...</a>
+                    </div>
                   </div>
                 <br><br>
                 <div class="card">
                     <h5 class="card-header">Follower's</h5>
                     <div class="card-body">
-                        {% for follower in profile.followed_by.all %}
+                        {% for follower in profile.followed_by.all|slice:5 %}
                             <a href="{% url 'profile' follower.user.id %}">@{{ follower }}
                               {% if request.user.id == profile.user.id %}
                               {% if follower in profile.follows.all %}
@@ -94,7 +101,11 @@
                               {% endif %}
                             </a> <br>
                         {% endfor %}
-                    </div>
+                        <br>
+                      </div>
+                        <div class="card-footer">
+                          <a href="{% url 'follower_list' profile.user.id %}">More ...</a>
+                        </div>
                   </div>
                   <br>
                   <form action="" method="post">

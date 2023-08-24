@@ -1,0 +1,37 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}
+    {{request.user.username}} Profile
+{% endblock title %}
+
+
+{% block content %}
+    <div class="container mt-2">
+        <h1 class="text-center">Follower's</h1>
+        {% if profiles %}
+            {% for profile in profiles.followed_by.all %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        {% if profile.profile_pic %}
+                        <img src="{{ profile.profile_pic.url }}" class="rounded-circle" width="50px" height="50px"  alt="">
+                        {% else %}
+                        <img src="{% static 'images/user1.png' %}" class="rounded-circle" width="50px" height="50px" alt="">
+                        {% endif %} <br>
+                        <h5 class="card-title" style="color: #2f7fbf; font-weight: bold; display: inline-block;">{{ profile.user.username }}</h5>
+                        {% if request.user.id == profiles.user.id %}
+                            {% if profile in profiles.follows.all %}
+                                <a href="{% url 'unfollow' profile.user.id %}" class="btn btn-sm btn-warning mt-1" style="display: inline-block; margin-left: 10px;">Unfollow</a>
+                            {% else %}
+                                <a href="{% url 'follow' profile.user.id %}" class="btn btn-sm btn-success mt-1" style="display: inline-block; margin-left: 10px;">Follow back</a>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <p class="card-text" style="color: #6c757d;">Link: <a href="{% url 'profile' profile.user.id %}">@{{ profile.user.username|lower }}</a></p>
+                        <p class="card-text" style="color: #6c757d;">Last Update: {{ profile.updated_date }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock content %}

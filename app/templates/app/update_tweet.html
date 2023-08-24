@@ -1,0 +1,27 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        {% if request.user.is_authenticated %}
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <!-- Notifications Section -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Edit Tweet</h5>
+                        <form action="" method="post">
+                            {% csrf_token %}
+                            {{ form.as_p }}
+                            <input type="submit" class="btn btn-primary" value="Edit">
+                        </form>
+                    </div>
+                </div>
+            </div>              
+        {% endif %}
+    </div>
+
+{% endblock content %}
