@@ -10,7 +10,7 @@ class Profile(models.Model):
     profile_pic = models.ImageField(null=True, blank=True, upload_to='images/')
     bio = models.TextField(null=True, blank=True)
     social_link = models.CharField(max_length=200, null=True, blank=True)
-    updated_date = models.DateTimeField(User, auto_now=True)
+    updated_date = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.user.username
